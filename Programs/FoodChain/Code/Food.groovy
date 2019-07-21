@@ -1,18 +1,28 @@
 class Food{
 	int type//0 = coffee, 7=drumstick
-	int x,y
-	Food(r,z){
-	println "$r, $z"
-		y = 8
-		x = z
-		type = r
+
+	boolean falling = true, control = true
+	int jx = 128, jw = 208
+	
+	Food(t){
+		type = t
+	}
+	def update(keyboard){
+
+	}
+
+	
+	def checkBelow(ch){
+//		if((x== ch.x) && y + 16 >= ch.y ){
+//			falling = false
+//			control = false
+//		} 
 	}
 	
-	def update(){
-		if(y < 128 ) y++
-	}
-	
-	def draw(screen){
+	def draw(screen, int x, int y){
 		screen.sprite(type, x, y, false, false, 1)
+	}
+	def draw(screen, int x, int y, flip){
+		screen.sprite(type, x, y, flip, false, 1)
 	}
 }
