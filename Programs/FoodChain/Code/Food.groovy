@@ -1,28 +1,17 @@
 class Food{
-	int type//0 = coffee, 7=drumstick
-
-	boolean falling = true, control = true
-	int jx = 128, jw = 208
+	int type//0 = coffee, 7=drumstick, 8 = removed
 	
 	Food(t){
 		type = t
 	}
-	def update(keyboard){
 
-	}
-
-	
-	def checkBelow(ch){
-//		if((x== ch.x) && y + 16 >= ch.y ){
-//			falling = false
-//			control = false
-//		} 
-	}
-	
 	def draw(screen, int x, int y){
+		if(type==8)return
 		screen.sprite(type, x, y, false, false, 1)
 	}
+	//Adding the flip for when the cursor is hovering over
 	def draw(screen, int x, int y, flip){
+		if(type == 8)return
 		screen.sprite(type, x, y, flip, false, 1)
 	}
 }
