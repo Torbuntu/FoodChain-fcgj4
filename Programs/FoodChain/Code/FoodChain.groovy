@@ -5,6 +5,7 @@ class FoodChain extends leikr.Engine {
 
 	int state = 0//0=title, 1=instructions, 2=Game play, 3=gameover
 	int bSpeed = 0
+	int dropSpeed = 0
 	//title variables
 	int blink = 0
 	//end title variables
@@ -12,8 +13,10 @@ class FoodChain extends leikr.Engine {
 	//play variables
 	int flipNext = 0
 	boolean select = false
+
 	int megaScore = 0 // used for advancing to next level, 96 = max
 	int level = 0 //might settle on 8 levels
+	int lives = 3
 	int available = 0//a meter of available moves
 	int row=8, col=6
 	def jar = new Food[col][row]
@@ -63,6 +66,7 @@ class FoodChain extends leikr.Engine {
     }
     void update(float delta){
     	bSpeed++
+    	dropSpeed++
         switch(state){
         	case 0:
     			if(keyPress("Space")) {
@@ -96,8 +100,9 @@ class FoodChain extends leikr.Engine {
         		
         		//START STATE 1 INPUT
         		handleInput()
+        		
         		//START STATE 1 UPDATE DROP
-        		updateDrop()
+        		updateFill()
         		
         		//CHECK LVL UP
         		if(megaScore >= 96){
@@ -199,7 +204,6 @@ class FoodChain extends leikr.Engine {
 				}
 			}
 		}
-	    println ("Pairs found: $match")
 	    available = match
 		if(match == 0 && !mSuper && !vSuper && !fSuper && !dSuper) return false//No moves
 		return true
@@ -297,7 +301,6 @@ class FoodChain extends leikr.Engine {
     			mSuper = true
     		}
     	}
-
     }
     
     //STATE 1 INPUT 
@@ -362,6 +365,7 @@ class FoodChain extends leikr.Engine {
 			if((keyPress("A")|| button(BTN.A) && bSpeed > 5)) {
 				select = true
 				bSpeed = 0
+				dropSpeed = 0
 			}
 		}else{			
 			checkMatches()
@@ -373,22 +377,21 @@ class FoodChain extends leikr.Engine {
     
     //STATE 1 UPDATE DROP
     //updateDrop checks every position to see if an item can be dropped a row.
-    def updateDrop(){
-    	if(jar[0][0].type == 8){
-    		jar[0][0] = new Food(randInt(7))
-    	}
-    	for(int i = 0; i < col; i++){
-    		if(jar[i][0].type==8) jar[i][0] = new Food(randInt(7))
-    		for(int j = 0; j < row; j++){
-    			if(j==row)return
-				if(j+1 < row && jar[i][j].type!=8 && jar[i][j+1].type==8){
-					def tmp = jar[i][j]
-					jar[i][j] = jar[i][j+1]
-					jar[i][j+1] = tmp   
+    def updateFill(){
+    	if(dropSpeed > 6){
+    		dropSpeed = 0
+			for(int i = 0; i < col; i++){
+				if(jar[i][0].type==8) jar[i][0] = new Food(randInt(7))
+				for(int j = 0; j < row; j++){
+					if(j==row)return
+					if(j+1 < row && jar[i][j].type!=8 && jar[i][j+1].type==8){
+						def tmp = jar[i][j]
+						jar[i][j] = jar[i][j+1]
+						jar[i][j+1] = tmp   
+					}
 				}
-    		}
-    	}
-    	
+			}
+		}
     }
     //END STATE 1 UPDATE DROP
     
