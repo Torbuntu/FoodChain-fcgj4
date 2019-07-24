@@ -24,3 +24,4 @@ A fair bit of design overhaul went into today. The main grid is now a square for
 Added lives so that when the board is empty of pairs the user loses a life and the board resets. This allows for longer play. Additional lives are earned with each level.
 The meter at the top is now the `hunger` meter and will drain slowly over the duration of gameplay. Each level causes hunger to drain quicker, up to level 4. After level 4 the rate is constant.
 The meter is filled with bonus combos of 3 to 6. 
+Updated the instructions screen to be more useful and colorful. 
