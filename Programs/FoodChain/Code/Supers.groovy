@@ -1,7 +1,7 @@
 class Supers {
 
 	//We know that the col and row numbers are 6 and 8 from the FoodChain.groovy. And we will not change this.
-	int row=8, col=6
+	int row=8, col=8
     //USE MEAT SUPER. ta=type A, tb = type B
     def useSuper(jar, ta, tb){
     	int tmp = 0
