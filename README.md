@@ -26,3 +26,17 @@ The meter at the top is now the `hunger` meter and will drain slowly over the du
 The meter is filled with bonus combos of 3 to 6. 
 Updated the instructions screen to be more useful and colorful. 
 Added a warning symbol for when <4 pairs are available. 
+
+## Day 4
+| Showcase |
+|----|
+| ![](Programs/FoodChain/Showcase/day4.gif?raw=true) |
+
+* Updated the Sprite sheet to look prettier. 
+* Added a new Acheivments page with 10 acheivments.
+* Added two new power ups. Bomb and Swap.
+* Fixed a lot of the Controller controls.
+* Updated the Game Over page.
+* Added a page 2 to instructions.
+* Made new notification for acheivment earnings.
+* lots of code cleanup.
