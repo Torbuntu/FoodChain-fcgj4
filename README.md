@@ -40,3 +40,9 @@ Added a warning symbol for when <4 pairs are available.
 * Added a page 2 to instructions.
 * Made new notification for acheivment earnings.
 * lots of code cleanup.
+
+## Day 5
+
+https://torbuntu.itch.io/foodchain-fcgj4
+
+No gif to showcase today. Major changes were all audio changes. Added a line between swapping tiles.
