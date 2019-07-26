@@ -92,6 +92,7 @@ class FoodChain extends leikr.Engine {
         switch(state){
         	case 0:
     			if(keyPress("Space") || button(BTN.SELECT) && bSpeed > btnSpeed) {
+    				sfx("start")
     				bSpeed = 0
     				state++
         			for(int i = 0; i < col; i++){
@@ -107,16 +108,19 @@ class FoodChain extends leikr.Engine {
         		if(blink > 20) blink = 0
         		blink++
         		if(keyPress("Space") || button(BTN.SELECT) && bSpeed > btnSpeed){
+	        		sfx("start")
         			bSpeed = 0
         			state++
         		}
         		
         		if(keyPress("Left") || button(BTN.LEFT) && bSpeed > btnSpeed){
+        			sfx("shift")
         			bSpeed = 0
         			page = false
         		}
         		
         		if(keyPress("Right") || button(BTN.RIGHT) && bSpeed > btnSpeed){
+        			sfx("shift")
         			bSpeed = 0
         			page = true
         		}
@@ -644,6 +648,7 @@ class FoodChain extends leikr.Engine {
 		}
 		//Bombs or Swaps
 		if( (keyPress("Q") || (button(BTN.LEFT_BUMPER) && bSpeed > btnSpeed)) && bombs > 0){
+			sfx("bomb")
 			bSpeed = 0
 			bombs--
 			explode(cx, cy)
@@ -715,10 +720,13 @@ class FoodChain extends leikr.Engine {
     //Draw cursor
     def drawCursor(){
     	if(usingSwap){
-			drawColor(13)
+			drawColor(9)
 			rect((int)(96+cx*16), (int)(16+cy*16), 16, 16)
 			drawColor(20)
 			rect((int)(96+swapX*16), (int)(16+swapY*16), 16, 16)
+			//Draw line between the swapping tiles
+			drawColor(22)
+			line((int)(96+swapX*16)+8, (int)(16+swapY*16)+8, (int)(96+cx*16)+8, (int)(16+cy*16)+8)
     		return
     	}
     	if(cf>10){
