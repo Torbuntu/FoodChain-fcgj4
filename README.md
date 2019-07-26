@@ -46,3 +46,21 @@ Added a warning symbol for when <4 pairs are available.
 https://torbuntu.itch.io/foodchain-fcgj4
 
 No gif to showcase today. Major changes were all audio changes. Added a line between swapping tiles.
+
+
+## Day 6
+| Showcase |
+|----|
+| ![](Programs/FoodChain/Showcase/day6.gif?raw=true) |
+
+Tidying up final code and refactoring. Controller util is now able to be toggled via Ctrl C and you can get back by pressing Ctrl B.
+
+Added a secret achievment. 
+
+Fixed up some sprites and art styles.
+
+Added screen shaking for lost lives and bomb explosions. 
+
+Created starvation where you lose health for moving too slow.
+
+more I forgot :( 
