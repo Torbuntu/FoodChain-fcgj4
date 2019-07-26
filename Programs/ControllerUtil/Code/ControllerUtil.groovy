@@ -12,6 +12,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
+import leikr.GameRuntime;//haaaaaack
+
 class ControllerUtil extends Engine {
     
     def settings = [:]
@@ -126,6 +128,11 @@ class ControllerUtil extends Engine {
         }
     }
     void update(float delta){
+    	if(keyPress("Control_Left") && keyPress("B")){
+    		println("::: Returning to Game FoodChain :::")
+    		GameRuntime.LAUNCH_TITLE = "FoodChain"
+    		loadProgram("FoodChain")
+    	}
         if(activeController){
             if(key("Q")){
                 saved = [X:false, A:false,B:false,Y:false,SELECT:false,START:false,LEFT_BUMPER:false,RIGHT_BUMPER:false,UP:false,DOWN:false,LEFT:false,RIGHT:false]

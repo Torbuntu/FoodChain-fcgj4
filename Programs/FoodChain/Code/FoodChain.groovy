@@ -1,50 +1,70 @@
 import Food
 import Supers
+import SaveUtil
+import leikr.GameRuntime;//haaaaaack
 class FoodChain extends leikr.Engine {
 
 	int state = 0//0=title, 1=instructions, 2=Game play, 3=gameover, 4=Acheivments
-	int bSpeed = 0, btnSpeed = 8
-	int dropSpeed = 0
+	int bSpeed = 0, btnSpeed = 8, dropSpeed = 0, blink = 0, flipNext = 0
+
 	boolean page = false//used for getting to page 2 of isntructions
-	//title variables
-	int blink = 0
-	//end title variables
 	
 	//play variables
-	int flipNext = 0
-	boolean select = false
-	boolean usingSwap = false
+
+	boolean select = false, usingSwap = false
 	int hungerSpeed = 0//The speed of hunger will increase with each level
 
-	int megaScore = 0 // used for advancing to next level, 96 = max
+	int megaScore = 10 // used for advancing to next level, 128 = max
 	int level = 1 //might settle on 4 levels
-	int lives = 1
+	int lives = 3
 	int available = 1//a meter of available moves
 	int row=8, col=8
 	def jar = new Food[col][row]
 	int fruits= 0, veggies = 0, meats = 0, drinks = 0
 	boolean fSuper = false, vSuper = false, mSuper = false, dSuper = false
+	
 	Supers supers = new Supers()
-	int bombs = 1, swaps = 1
-	int bombDur = 0
-	int bombX, bombY
+	SaveUtil saveUtil = new SaveUtil()
+	int	high_score = saveUtil.loadScore()
 	
-	int swapX, swapY
-	
-	int goX, goY
+	int bombs = 1, swaps = 1, bombDur = 0, bombX, bombY, swapX, swapY, goX, goY
 	
 	def goWave = [6,4,2,0,0,2,4,6]
 	
+	int shake = 0, bgX = 0, bgY = 0
 	boolean aDairyQueen = false, aMeatPump = false, aGrassGreener = false, aAllOrangeJuice = false, aFive = false, aTen = false, aFifteen = false, aTwenty = false, aBombBastic = false, aYeOleSwitcheroo = false
 	
+	int airEaten = 0
 	int newAcheivmentIcon = 0, achSpeed = 100
 	
 	//cursor x, y and flash
 	int cx=0, cy=0, cf = 0
+	
+	int starving = 200
 	//END play variables
 	
 	def init(){
-		state = 0//0=title, 1=instructions, 2=Game play, 3=gameover
+		airEaten = 0
+		high_score = saveUtil.loadScore()
+		aDairyQueen = false
+		aMeatPump = false
+		aGrassGreener = false
+		aAllOrangeJuice = false
+		aFive = false
+		aTen = false
+		aFifteen = false
+		aTwenty = false
+		aBombBastic = false
+		aYeOleSwitcheroo = false
+		
+		shake = 0
+		bgX = 0
+		bgY = 0
+		
+		starving = 200
+		newAcheivmentIcon = 0
+		achSpeed = 100
+		state = 0//0=title, 1=instructions, 2=Game play, 3=gameover, 4 = achievments
 		bSpeed = 0
 		dropSpeed = 0
 		hungerSpeed = 0 
@@ -56,9 +76,9 @@ class FoodChain extends leikr.Engine {
 		//play variables
 		flipNext = 0
 		select = false
-		megaScore = 0 // used for advancing to next level, 96 = max
-		level = 1 //might settle on 8 levels
-		lives = 1
+		megaScore = 10 // used for advancing to next level, 128 = max
+		level = 1 
+		lives = 3
 		available = 1
 
 		jar = new Food[col][row]
@@ -83,12 +103,18 @@ class FoodChain extends leikr.Engine {
 	
     void create(){
         loadImages()
+        
     }
     
     //START UPDATE
     void update(float delta){
     	bSpeed++
     	dropSpeed++
+    	if(key("Control_Left") && key("C")){
+    		println("::: Starting Controller Utility :::")
+    		GameRuntime.LAUNCH_TITLE = "ControllerUtil"
+    		loadProgram("ControllerUtil")
+    	}
         switch(state){
         	case 0:
         		music("title", true)
@@ -96,8 +122,8 @@ class FoodChain extends leikr.Engine {
     				sfx("start")
     				bSpeed = 0
     				state++
-        			for(int i = 0; i < col; i++){
-		    			for(int j = 0; j < row; j++){
+        			col.times{i->
+		    			row.times{j->
 		    				jar[i][j] = new Food(randInt(7), randInt(100))
 		    			}
 		    		}
@@ -205,6 +231,7 @@ class FoodChain extends leikr.Engine {
         		if(!movesExist()){
         			if(lives > 0){
         				sfx("noMove")
+        				shake = 15
         				lives--
         				resetBoard()
         				megaScore = megaScore - 46
@@ -228,18 +255,39 @@ class FoodChain extends leikr.Engine {
         		if(megaScore >= 128){
         			megaScore = 0
         			level++
+        			high_score = level
+        			saveUtil.saveScore(high_score)
         			lives++
         			sfx("lifeUp")        			
         			if(lives>9) lives = 10
         		}
+        		if(megaScore == 0){
+        			starving--
+        			if(starving == 0){
+        				starving = 200
+        				lives--
+        				sfx("noMove")
+        				shake = 15
+        			}
+        		}
+        		if(megaScore > 0){
+        			starving = 200
+        		}
         		
+        		if(lives == 0){
+        			state = 3
+        			saveUtil.saveScore(high_score)
+        		}
         		//CHECK ACHEIVMENTS
         		checkAcheivments()
         		if(newAcheivmentIcon > 0) newAcheivmentIcon--
+        		
+        		
         		break;
-        	case 3:
+        	case 3://Game over
         		if(keyPress("Space") || button(BTN.SELECT) && bSpeed > btnSpeed){
         			init()
+        			sfx("shift")
         		}
         		if(blink > 20) blink = 0
         		blink++
@@ -248,6 +296,7 @@ class FoodChain extends leikr.Engine {
         		if(keyPress("Space") || button(BTN.SELECT) && bSpeed > btnSpeed){
         			bSpeed = 0
         			state = 2
+        			sfx("shift")
         		}
         		
         		break;
@@ -265,6 +314,9 @@ class FoodChain extends leikr.Engine {
         		}else{
         			text("Press Space/Select", 58, 124, 120, 1, 32)
         		}
+        		text("High Score: $high_score", 58, 108, 120, 1, 16)
+        		text("High Score: $high_score", 59, 109, 120, 1, 32)
+        		
     			
         		break;
         	case 1:
@@ -272,11 +324,17 @@ class FoodChain extends leikr.Engine {
         		break;
         	case 2://game play
         		//background image. Obvi
-        		image("bg",0,0)
+        		if(shake>0){
+        			bgX = randInt(-2, 2)
+        			shake--
+        		}else{
+        			bgX = 0
+        		}
+        		image("bg",bgX,bgY)
         		
         		//Draws the items in the jar
-        		for(int i = 0; i < col; i++){
-	    			for(int j = 0; j < row; j++){
+        		col.times{i->
+	    			row.times{j->
 	    				if(i ==cx && j==cy){
 	    					if(cf > 10){
 	    						jar[i][j].draw(screen,(int)(96+ i*16),(int)(16+j*16), true)
@@ -309,6 +367,10 @@ class FoodChain extends leikr.Engine {
 	    		rect(232, 144, 2, -available*4, true)
 	    		if(available <= 4){
 	    			sprite(81, 229, 148)
+	    		}
+	    		
+	    		if(megaScore == 0 && cf > 10){
+	    			sprite(81, 90, 5)
 	    		}
 	    		
 	    		//Draw bombs and swaps
@@ -355,7 +417,8 @@ class FoodChain extends leikr.Engine {
         		}else{
         			text("Press Space/Select", 58, 124, 120, 1, 32)
         		}
-        		
+        		text("High Score: $high_score", 58, 108, 120, 1, 16)
+        		text("High Score: $high_score", 59, 109, 120, 1, 32)
         		
         		break;
         		
@@ -363,6 +426,8 @@ class FoodChain extends leikr.Engine {
 				image("awards", 0,0)
 				text("Acheivments", 0, 16, 240, 1, 32)
 				drawAcheivments()
+				if(airEaten>0) text("You this much air: $airEaten", 8, 130, 240, 0, 16)
+				
 
     			break;
         }
@@ -374,8 +439,8 @@ class FoodChain extends leikr.Engine {
     
     def movesExist(){
     	def match = 0
-    	for(int i = 0; i < col; i++){
-			for(int j = 0; j < row; j++){
+    	col.times{i->
+			row.times{j->
 				int tp = jar[i][j].type
 				if((i > 0 && jar[i-1][j].type != tp || i == 0) 
 						&& (i < col-1 && jar[i+1][j].type != tp || i == 7) 
@@ -389,10 +454,12 @@ class FoodChain extends leikr.Engine {
 		}
 	    available = match
 		boolean swpBmbAvl = false
-		jar.each{
-			it.each{ p->
-				if(p.type == 10 || p.type == 11)swpBmbAvl = true
-			}				
+		if(match==0){
+			jar.each{
+				it.each{ p->
+					if(p.type == 10 || p.type == 11)swpBmbAvl = true
+				}				
+			}
 		}
 		if(match == 0 && !mSuper && !vSuper && !fSuper && !dSuper && bombs == 0 && swaps == 0 && !swpBmbAvl) return false//No moves
 		return true
@@ -401,6 +468,7 @@ class FoodChain extends leikr.Engine {
     
     def checkMatches(x,y){
     	def tp = jar[x][y].type//temp type
+    	if(tp==8)airEaten++
 		if(tp == 10){
 			bombs++
 			if(bombs>10)bombs=10
@@ -556,8 +624,8 @@ class FoodChain extends leikr.Engine {
     
     //RESET BOARD
     def resetBoard(){
-		for(int i = 0; i < col; i++){
-			for(int j = 0; j < row; j++){
+		col.times{i->
+			row.times{j->
 				jar[i][j] = new Food(randInt(7), randInt(100))
 			}
 		}		
@@ -567,6 +635,7 @@ class FoodChain extends leikr.Engine {
     //BOMB POWER
     def explode(x,y){
     	bombDur = 10
+    	shake = 10
     	
     	bombX = x-1
     	bombY = y-1
@@ -612,14 +681,12 @@ class FoodChain extends leikr.Engine {
 		if(keyPress("C")){
 			checkAvailableMoves()
 		}
-		if(keyPress("E")){
-			state = 3
-		}
 		//End debug
 		
 		//ENTER ACHEIVMENT PAGE
 		if(keyPress("Space") || button(BTN.SELECT) && bSpeed > btnSpeed) {
 			state = 4
+			sfx("shift")
 		}  
 		
 		if(usingSwap){
@@ -717,9 +784,9 @@ class FoodChain extends leikr.Engine {
     def updateFill(){
     	if(dropSpeed > 6){
     		dropSpeed = 0
-			for(int i = 0; i < col; i++){
+			col.times{i->
 				if(jar[i][0].type==8) jar[i][0] = new Food(randInt(7), randInt(100))
-				for(int j = 0; j < row; j++){
+				row.times{j->
 					if(j==row)return
 					if(j+1 < row && jar[i][j].type!=8 && jar[i][j+1].type==8){
 						def tmp = jar[i][j]
@@ -896,18 +963,18 @@ class FoodChain extends leikr.Engine {
     }
 
 	def drawAcheivments(){
-		if(aFive) sprite(19, 16, 40, 1)
-		if(aTen) sprite(20, 64, 40, 1)
-		if(aFifteen) sprite(21, 112, 40, 1)
-		if(aTwenty) sprite(22, 160, 40, 1)
+		if(aFive) {sprite(19, 16, 40, 1)}else{sprite(23, 16, 40, 1)}
+		if(aTen) {sprite(20, 64, 40, 1)}else{sprite(23, 64, 40, 1)}
+		if(aFifteen) {sprite(21, 112, 40, 1)}else{sprite(23, 112, 40, 1)}
+		if(aTwenty) {sprite(22, 160, 40, 1)}else{sprite(23, 160, 40, 1)}
 		
-		if(aBombBastic) sprite(10, 16, 104,1)
-		if(aYeOleSwitcheroo) sprite(11, 64, 104,1)
-		if(aMeatPump) sprite(13, 112, 104,1)
-		if(aAllOrangeJuice) sprite(15, 160, 104,1)
+		if(aBombBastic) {sprite(10, 16, 104,1)}else{sprite(23, 16, 104, 1)}
+		if(aYeOleSwitcheroo){ sprite(11, 64, 104,1)}else{sprite(23, 64, 104, 1)}
+		if(aMeatPump) {sprite(13, 112, 104,1)}else{sprite(23, 112, 104, 1)}
+		if(aAllOrangeJuice) {sprite(15, 160, 104,1)}else{sprite(23, 160, 104, 1)}
 		
-		if(aDairyQueen) sprite(12, 208, 40,1)
-		if(aGrassGreener) sprite(14, 208, 104,1)
+		if(aDairyQueen) {sprite(12, 208, 40,1)}else{sprite(23, 208, 40, 1)}
+		if(aGrassGreener){ sprite(14, 208, 104,1)}else{sprite(23, 208, 104, 1)}
 	}
 
 }
