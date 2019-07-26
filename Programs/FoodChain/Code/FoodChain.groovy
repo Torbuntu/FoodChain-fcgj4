@@ -91,6 +91,7 @@ class FoodChain extends leikr.Engine {
     	dropSpeed++
         switch(state){
         	case 0:
+        		music("title", true)
     			if(keyPress("Space") || button(BTN.SELECT) && bSpeed > btnSpeed) {
     				sfx("start")
     				bSpeed = 0
@@ -109,6 +110,7 @@ class FoodChain extends leikr.Engine {
         		blink++
         		if(keyPress("Space") || button(BTN.SELECT) && bSpeed > btnSpeed){
 	        		sfx("start")
+	        		stopAllMusic()
         			bSpeed = 0
         			state++
         		}
@@ -202,6 +204,7 @@ class FoodChain extends leikr.Engine {
         		//CHECL AVAILABLE MOVES
         		if(!movesExist()){
         			if(lives > 0){
+        				sfx("noMove")
         				lives--
         				resetBoard()
         				megaScore = megaScore - 46
@@ -226,6 +229,7 @@ class FoodChain extends leikr.Engine {
         			megaScore = 0
         			level++
         			lives++
+        			sfx("lifeUp")        			
         			if(lives>9) lives = 10
         		}
         		
@@ -401,23 +405,28 @@ class FoodChain extends leikr.Engine {
 			bombs++
 			if(bombs>10)bombs=10
 			jar[x][y].type = 8
+			sfx("item")
 			return
 		}
 		if(tp == 11){
 			swaps++
 			if(swaps>10)swaps=10
 			jar[x][y].type = 8
+			sfx("item")
 			return
 		}
  		//If no matches on any sides in middle.
 	    if(	(x > 0 && jar[x-1][y].type != tp || x == 0) 
 	    	&& (x < col-1 && jar[x+1][y].type != tp || x == 7) 
 	    	&& (y > 0 && jar[x][y-1].type != tp || y == 0) 
-	    	&& (y < row-1 && jar[x][y+1].type != tp || y == 7) ) return
+	    	&& (y < row-1 && jar[x][y+1].type != tp || y == 7) ) {
+	    		sfx("select")
+	    		return
+	    	}
 
 	    
     	jar[x][y].type = 8
-    	
+    	sfx("eat")
     	int score = matchesScoring(tp, x, y)
       	
     	foodTypeScoreCheck(tp, score)
@@ -593,6 +602,7 @@ class FoodChain extends leikr.Engine {
     	jar[x][y].type = temp
     	usingSwap = false
     	swaps--
+    	sfx("swap")
     }
     //END SWAP POWER
     
@@ -623,24 +633,28 @@ class FoodChain extends leikr.Engine {
 		
 		//Check for Super usage input
 		if(mSuper && (keyPress("X") || button(BTN.X) && bSpeed > btnSpeed)){
+			sfx("feast")
 			bSpeed = 0
 			mSuper = false
 			megaScore += supers.useSuper(jar, 6, 7)
 			meats = 0
 		}
 		if(vSuper && (keyPress("Y") || button(BTN.X) && bSpeed > btnSpeed)){
+			sfx("feast")
 			bSpeed = 0
 			vSuper = false
 			megaScore += supers.useSuper(jar, 2, 3)
 			veggies = 0
 		}
 		if(fSuper && (keyPress("Z") || button(BTN.X) && bSpeed > btnSpeed)){
+			sfx("feast")
 			bSpeed = 0
 			fSuper = false
 			megaScore += supers.useSuper(jar, 4, 5)
 			fruits = 0
 		}
 		if(dSuper && (keyPress("B") || button(BTN.X) && bSpeed > btnSpeed)){
+			sfx("feast")
 			bSpeed = 0
 			dSuper = false
 			megaScore += supers.useSuper(jar, 0, 1)
@@ -664,6 +678,7 @@ class FoodChain extends leikr.Engine {
 			moveCursor()
 			if((keyPress("A")|| button(BTN.A) && bSpeed > btnSpeed)) {
 				select = true
+				
 				bSpeed = 0
 				dropSpeed = 0
 			}
@@ -827,44 +842,54 @@ class FoodChain extends leikr.Engine {
     
     def checkAcheivments(){
     	if(level >= 5 && !aFive) {
+    		sfx("award")
 	    	aFive = true
 	    	newAcheivmentIcon = achSpeed
     	}
     	if(level >= 10 && !aTen) {
+    		sfx("award")
     		aTen = true
     		newAcheivmentIcon = achSpeed
     	}
     	if(level >= 15 && !aFifteen){
+    		sfx("award")
     		aFifteen = true
     		newAcheivmentIcon = achSpeed
     	} 
     	if(level >= 20 && !aTwenty){
+    		sfx("award")
     		aTwenty = true
     		newAcheivmentIcon = achSpeed
     	} 
     	
     	if(bombs == 10 && !aBombBastic){
+    		sfx("award")
     		aBombBastic = true
     		newAcheivmentIcon = achSpeed
     	} 
     	if(swaps == 10 && !aYeOleSwitcheroo){
+    		sfx("award")
     		aYeOleSwitcheroo = true
     		newAcheivmentIcon = achSpeed
     	} 
     	
     	if(meats >= 40 && !aMeatPump) {
+    		sfx("award")
     		aMeatPump = true
     		newAcheivmentIcon = achSpeed
     	}
     	if(veggies >= 40 && !aGrassGreener) {
+    		sfx("award")
     		aGrassGreener = true
     		newAcheivmentIcon = achSpeed
     	}
     	if(fruits >= 40 && !aAllOrangeJuice) {
+    		sfx("award")
     		aAllOrangeJuice = true
     		newAcheivmentIcon = achSpeed
     	}
     	if(drinks >= 40 && !aDairyQueen) {
+    		sfx("award")
     		newAcheivmentIcon = achSpeed
     		aDairyQueen = true
     	}
