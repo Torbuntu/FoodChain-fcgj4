@@ -8,7 +8,6 @@ class FoodChain extends leikr.Engine {
 	int bSpeed = 0, btnSpeed = 8, dropSpeed = 0, blink = 0, flipNext = 0
 
 	boolean page = false//used for getting to page 2 of isntructions
-	
 	//play variables
 
 	boolean select = false, usingSwap = false
@@ -118,9 +117,8 @@ class FoodChain extends leikr.Engine {
         switch(state){
         	case 0:
         		music("title", true)
-    			if(keyPress("Space") || button(BTN.SELECT) && bSpeed > btnSpeed) {
+    			if(keyPress("Space") || bp(BTN.SELECT)) {
     				sfx("start")
-    				bSpeed = 0
     				state++
         			col.times{i->
 		    			row.times{j->
@@ -134,22 +132,19 @@ class FoodChain extends leikr.Engine {
         	case 1://Instructions
         		if(blink > 20) blink = 0
         		blink++
-        		if(keyPress("Space") || button(BTN.SELECT) && bSpeed > btnSpeed){
+        		if(keyPress("Space") || bp(BTN.SELECT) ){
 	        		sfx("start")
 	        		stopAllMusic()
-        			bSpeed = 0
         			state++
         		}
         		
-        		if(keyPress("Left") || button(BTN.LEFT) && bSpeed > btnSpeed){
+        		if(keyPress("Left") || bp(BTN.LEFT)){
         			sfx("shift")
-        			bSpeed = 0
         			page = false
         		}
         		
-        		if(keyPress("Right") || button(BTN.RIGHT) && bSpeed > btnSpeed){
+        		if(keyPress("Right") || bp(BTN.RIGHT) ){
         			sfx("shift")
-        			bSpeed = 0
         			page = true
         		}
         		
@@ -285,7 +280,7 @@ class FoodChain extends leikr.Engine {
         		
         		break;
         	case 3://Game over
-        		if(keyPress("Space") || button(BTN.SELECT) && bSpeed > btnSpeed){
+        		if(keyPress("Space") || bp(BTN.SELECT) ){
         			init()
         			sfx("shift")
         		}
@@ -293,8 +288,7 @@ class FoodChain extends leikr.Engine {
         		blink++
         		break;
         	case 4: //Acheivments
-        		if(keyPress("Space") || button(BTN.SELECT) && bSpeed > btnSpeed){
-        			bSpeed = 0
+        		if(keyPress("Space") || bp(BTN.SELECT) ){
         			state = 2
         			sfx("shift")
         		}
@@ -426,7 +420,7 @@ class FoodChain extends leikr.Engine {
 				image("awards", 0,0)
 				text("Acheivments", 0, 16, 240, 1, 32)
 				drawAcheivments()
-				if(airEaten>0) text("You this much air: $airEaten", 8, 130, 240, 0, 16)
+				if(airEaten>0) text("Air eaten: $airEaten", 8, 130, 240, 0, 16)
 				
 
     			break;
@@ -684,58 +678,51 @@ class FoodChain extends leikr.Engine {
 		//End debug
 		
 		//ENTER ACHEIVMENT PAGE
-		if(keyPress("Space") || button(BTN.SELECT) && bSpeed > btnSpeed) {
+		if(keyPress("Space") || bp(BTN.SELECT)) {
 			state = 4
 			sfx("shift")
 		}  
 		
 		if(usingSwap){
 			moveCursor()
-			if(keyPress("W") || button(BTN.RIGHT_BUMPER) && bSpeed > btnSpeed){
-				bSpeed = 0
+			if(keyPress("W") || bp(BTN.RIGHT_BUMPER)){
 				doSwap(cx, cy)
 			}
 			return
 		}
 		
 		//Check for Super usage input
-		if(mSuper && (keyPress("X") || button(BTN.X) && bSpeed > btnSpeed)){
+		if(mSuper && (keyPress("X") || bp(BTN.X) )){
 			sfx("feast")
-			bSpeed = 0
 			mSuper = false
 			megaScore += supers.useSuper(jar, 6, 7)
 			meats = 0
 		}
-		if(vSuper && (keyPress("Y") || button(BTN.X) && bSpeed > btnSpeed)){
+		if(vSuper && (keyPress("Y") || bp(BTN.Y))){
 			sfx("feast")
-			bSpeed = 0
 			vSuper = false
 			megaScore += supers.useSuper(jar, 2, 3)
 			veggies = 0
 		}
-		if(fSuper && (keyPress("Z") || button(BTN.X) && bSpeed > btnSpeed)){
+		if(fSuper && (keyPress("Z") || bp(BTN.X) )){
 			sfx("feast")
-			bSpeed = 0
 			fSuper = false
 			megaScore += supers.useSuper(jar, 4, 5)
 			fruits = 0
 		}
-		if(dSuper && (keyPress("B") || button(BTN.X) && bSpeed > btnSpeed)){
+		if(dSuper && (keyPress("B") || bp(BTN.B) )){
 			sfx("feast")
-			bSpeed = 0
 			dSuper = false
 			megaScore += supers.useSuper(jar, 0, 1)
 			drinks = 0
 		}
 		//Bombs or Swaps
-		if( (keyPress("Q") || (button(BTN.LEFT_BUMPER) && bSpeed > btnSpeed)) && bombs > 0){
+		if( (keyPress("Q") || (bp(BTN.LEFT_BUMPER))) && bombs > 0){
 			sfx("bomb")
-			bSpeed = 0
 			bombs--
 			explode(cx, cy)
 		}
-		if( (keyPress("W") || (button(BTN.RIGHT_BUMPER) && bSpeed > btnSpeed)) && swaps > 0){
-			bSpeed = 0
+		if( (keyPress("W") || (bp(BTN.RIGHT_BUMPER))) && swaps > 0){
 			swapStart(cx, cy)
 			return
 		}
@@ -743,10 +730,8 @@ class FoodChain extends leikr.Engine {
 		//Cursor movement
 		if(!select){
 			moveCursor()
-			if((keyPress("A")|| button(BTN.A) && bSpeed > btnSpeed)) {
+			if((keyPress("A")|| bp(BTN.A))) {
 				select = true
-				
-				bSpeed = 0
 				dropSpeed = 0
 			}
 		}else{			
@@ -760,21 +745,17 @@ class FoodChain extends leikr.Engine {
     
     //MOVEMENT
     def moveCursor(){
-    	if((keyPress("Right") || button(BTN.RIGHT) && bSpeed > btnSpeed) && cx < 7) {
+    	if((keyPress("Right") || bp(BTN.RIGHT)) && cx < 7) {
 			cx ++
-			bSpeed = 0
 		}
-		if((keyPress("Left")|| button(BTN.LEFT) && bSpeed > btnSpeed) && cx > 0) {
+		if((keyPress("Left")|| bp(BTN.LEFT)) && cx > 0) {
 			cx --
-			bSpeed = 0
 		}
-		if((keyPress("Up") || button(BTN.UP) && bSpeed > btnSpeed) && cy > 0) {
+		if((keyPress("Up") || bp(BTN.UP)) && cy > 0) {
 			cy--
-			bSpeed = 0
 		}
-		if((keyPress("Down")|| button(BTN.DOWN) && bSpeed > btnSpeed) && cy < 7){
+		if((keyPress("Down")|| bp(BTN.DOWN)) && cy < 7){
 			cy++
-			bSpeed = 0
 		} 
     }
     //END MOVEMENT
@@ -975,6 +956,14 @@ class FoodChain extends leikr.Engine {
 		
 		if(aDairyQueen) {sprite(12, 208, 40,1)}else{sprite(23, 208, 40, 1)}
 		if(aGrassGreener){ sprite(14, 208, 104,1)}else{sprite(23, 208, 104, 1)}
+	}
+	
+	boolean bp(b){
+		if(button(b) && bSpeed > btnSpeed ){
+			bSpeed = 0
+			return true
+		}
+		return false
 	}
 
 }
